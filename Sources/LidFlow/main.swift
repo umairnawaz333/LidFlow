@@ -68,8 +68,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         guard let button = statusItem?.button else { return }
         
-        // Set initial state
-        button.title = "∠ 0°"
+        // Use a semibold monospaced digit system font so values look bold and stable (no horizontal wiggling)
+        button.font = NSFont.monospacedDigitSystemFont(ofSize: 13.5, weight: .semibold)
+        button.title = "∡ 0°"
         
         let menu = NSMenu()
         
@@ -133,8 +134,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     private func updateMenuBar(angle: Double) {
         if let button = statusItem?.button {
-            // Round angle to nearest integer for menu bar display (e.g. 116.7° -> 117°)
-            button.title = String(format: "∠ %.0f°", round(angle))
+            // Use Measured Angle with Arc symbol '∡', rounded to the nearest integer (e.g. 116.7 -> 117)
+            button.title = String(format: "∡ %.0f°", round(angle))
         }
         
         // Sync menu item checkmarks with the shared state (in case they were changed in the main UI)
