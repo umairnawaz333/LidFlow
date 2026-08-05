@@ -4,6 +4,7 @@ import Combine
 
 class LidSensor: ObservableObject {
     @Published var angle: Double = 0.0
+    @Published var speed: Double = 0.0
     @Published var isConnected: Bool = false
     
     private var manager: IOHIDManager?
@@ -119,6 +120,10 @@ class LidSensor: ObservableObject {
             self.lastAngle = current
             
             self.angle = current
+            
+            // Calculate and smooth movement speed (degrees/second)
+            let rawSpeed = abs(delta) / 0.05
+            self.speed = self.speed * 0.75 + rawSpeed * 0.25
             
             // Trigger audio controllers with real-time delta (including 0 when stationary)
             SoundSynth.shared.updateTheremin(angle: current, deltaAngle: delta)

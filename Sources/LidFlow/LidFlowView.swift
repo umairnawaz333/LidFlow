@@ -14,7 +14,7 @@ struct LidFlowView: View {
             HeaderView(isConnected: sensor.isConnected)
             
             // Real-time Visualizer Panel
-            VisualizerPanel(angle: sensor.angle)
+            VisualizerPanel(angle: sensor.angle, speed: sensor.speed)
             
             // Controls List
             VStack(spacing: 12) {
@@ -90,49 +90,98 @@ struct HeaderView: View {
     }
 }
 
+// MARK: - MacBook Base Shape
+struct MacBookBase: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY + 1))
+        path.addLine(to: CGPoint(x: rect.maxX - 12, y: rect.minY + 4))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.maxY), control: CGPoint(x: rect.maxX, y: rect.minY + 4))
+        path.addLine(to: CGPoint(x: rect.minX + 4, y: rect.maxY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.minY + 1), control: CGPoint(x: rect.minX, y: rect.maxY))
+        return path
+    }
+}
+
 // MARK: - Visualizer Panel
 struct VisualizerPanel: View {
     let angle: Double
+    let speed: Double
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
             // Large Centered Display
-            VStack(spacing: 0) {
+            VStack(spacing: 4) {
                 Text(String(format: "%.1f°", angle))
                     .font(.system(size: 64, weight: .thin, design: .rounded))
                     .foregroundColor(.primary)
-                Text("CURRENT ANGLE")
-                    .font(.system(size: 10, weight: .bold))
+                
+                // Speed indicator below the angle
+                HStack(spacing: 4) {
+                    Image(systemName: "gauge.with.needle")
+                        .font(.system(size: 11))
+                    Text(speed > 0.5 ? String(format: "Speed: %.1f°/s", speed) : "Stationary")
+                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                }
+                .foregroundColor(speed > 0.5 ? .accentColor : .secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.primary.opacity(0.04))
+                .cornerRadius(6)
+                
+                Text("CURRENT HINGE ANGLE")
+                    .font(.system(size: 9, weight: .bold))
                     .foregroundColor(.secondary)
                     .tracking(2)
+                    .padding(.top, 6)
             }
+            
+            // Large spacer to prevent screen lid overlapping with text
+            Spacer(minLength: 32)
             
             // Dynamic Laptop Graphic
             ZStack(alignment: .bottomLeading) {
                 // Lower Body (Base)
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.primary.opacity(0.15))
-                    .frame(width: 140, height: 6)
-                    .offset(x: 10, y: 0)
-                
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.primary.opacity(0.7))
-                    .frame(width: 130, height: 2)
-                    .offset(x: 15, y: -4)
+                ZStack(alignment: .bottomLeading) {
+                    // Rubber feet
+                    HStack {
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color.primary.opacity(0.8))
+                            .frame(width: 10, height: 2)
+                        Spacer()
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color.primary.opacity(0.8))
+                            .frame(width: 10, height: 2)
+                    }
+                    .frame(width: 120)
+                    .offset(x: 10, y: 7)
+                    
+                    // Tapered Chassis
+                    MacBookBase()
+                        .fill(LinearGradient(colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.08)], startPoint: .top, endPoint: .bottom))
+                        .frame(width: 140, height: 6)
+                }
+                .offset(x: 10, y: 0)
                 
                 // Screen (Lid) - rotates around the bottom leading edge
                 ZStack(alignment: .leading) {
-                    // Back Bezel
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.primary.opacity(0.85))
-                        .frame(width: 136, height: 4)
+                    // Aluminum back
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(LinearGradient(colors: [Color.primary.opacity(0.4), Color.primary.opacity(0.2)], startPoint: .top, endPoint: .bottom))
+                        .frame(width: 135, height: 3.5)
                     
-                    // Display glowing screen line
+                    // Glass bezel
                     RoundedRectangle(cornerRadius: 1)
-                        .fill(Color.accentColor)
-                        .frame(width: 132, height: 2)
-                        .offset(x: 2, y: 1)
-                        .opacity(angle > 5.0 ? 1.0 : 0.0)
+                        .fill(Color.primary.opacity(0.85))
+                        .frame(width: 133, height: 2.2)
+                        .offset(x: 1, y: 0.6)
+                    
+                    // Glowing screen active line
+                    RoundedRectangle(cornerRadius: 0.5)
+                        .fill(LinearGradient(colors: [Color.blue, Color.cyan], startPoint: .leading, endPoint: .trailing))
+                        .frame(width: 130, height: 1.2)
+                        .offset(x: 2, y: 1.1)
+                        .opacity(angle > 3.0 ? 1.0 : 0.0)
                 }
                 .rotationEffect(.degrees(-angle), anchor: .leading)
                 .offset(x: 10, y: -4)
@@ -143,8 +192,8 @@ struct VisualizerPanel: View {
                     .frame(width: 8, height: 8)
                     .offset(x: 6, y: -2)
             }
-            .frame(width: 160, height: 120)
-            .padding(.vertical, 8)
+            .frame(width: 160, height: 140)
+            .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)

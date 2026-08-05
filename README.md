@@ -8,6 +8,10 @@ It features:
 3. **LidTheremin (Screen Synth)**: Turns your screen into a musical instrument. Adjusting the screen angle sweeps the pitch of a real-time synthesized sine, triangle, or sawtooth wave. Features volume decay when stationary.
 
 <p align="center">
+  <img src="screenshot.png" alt="LidFlow App Screenshot" width="380">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/macOS-13.0%2B-blue?style=flat-square&logo=apple" alt="macOS Version">
   <img src="https://img.shields.io/badge/Swift-5.10-orange?style=flat-square&logo=swift" alt="Swift Version">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
