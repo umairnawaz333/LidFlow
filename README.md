@@ -23,7 +23,26 @@ It features:
 
 ---
 
-## 🛠️ Build and Run
+## 📥 Installation
+
+### Via Homebrew
+
+You can install LidFlow as a Homebrew Cask from the custom tap:
+
+```bash
+# Add the tap
+brew tap umairnawaz333/tap
+
+# Install LidFlow Cask
+brew install --cask lidflow
+```
+
+* **Homebrew Tap Repository**: [umairnawaz333/homebrew-tap](https://github.com/umairnawaz333/homebrew-tap)
+* **Cask Definition**: [`lidflow.rb`](file:///Users/umairnawaz/Projects/macbook-lid-project/lidflow.rb)
+
+---
+
+## 🛠️ Build and Run (Development/Manual)
 
 To compile and package the app into a standalone macOS `.app` bundle:
 
