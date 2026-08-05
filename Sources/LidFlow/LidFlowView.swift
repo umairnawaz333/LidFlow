@@ -9,7 +9,7 @@ struct LidFlowView: View {
     @State private var oscillatorType = "Sine"
     
     var body: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: 18) {
             // Header
             HeaderView(isConnected: sensor.isConnected)
             
@@ -17,7 +17,7 @@ struct LidFlowView: View {
             VisualizerPanel(angle: sensor.angle, speed: sensor.speed)
             
             // Controls List
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 // Door Sounds Config Card
                 DoorSoundsCard(
                     enabled: $doorSoundsEnabled,
@@ -38,8 +38,8 @@ struct LidFlowView: View {
             // Footer
             FooterView()
         }
-        .frame(width: 380, height: 620)
         .padding(.vertical, 16)
+        .frame(width: 380, height: 660)
         .onAppear {
             sensor.startMonitoring()
             // Set initial volumes

@@ -10,7 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // Build window
         window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 620),
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 660),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
