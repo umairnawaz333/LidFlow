@@ -44,12 +44,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
         
         // Set application Dock icon programmatically from main bundle resources
-        if let iconURL = Bundle.main.url(forResource: "logo", withExtension: "jpg"),
+        if let iconURL = Bundle.main.url(forResource: "logo", withExtension: "png"),
            let iconImage = NSImage(contentsOf: iconURL) {
             NSApplication.shared.applicationIconImage = iconImage
         } else {
             // Fallback to local path check
-            let iconPath = "logo.jpg"
+            let iconPath = "logo.png"
             if FileManager.default.fileExists(atPath: iconPath),
                let iconImage = NSImage(contentsOfFile: iconPath) {
                 NSApplication.shared.applicationIconImage = iconImage
@@ -87,11 +87,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         path.line(to: NSPoint(x: 12, y: 2))
         path.stroke()
         
-        // Draw the curved arc indicator separately to prevent connecting-line rendering bugs
+        // Draw the curved arc indicator using a Bezier curve to guarantee rendering across all macOS systems
         let arcPath = NSBezierPath()
         arcPath.lineWidth = 1.3
         arcPath.lineCapStyle = .round
-        arcPath.appendArc(withCenter: NSPoint(x: 2, y: 2), radius: 5.0, startAngle: 0.0, endAngle: 45.0)
+        arcPath.move(to: NSPoint(x: 6.8, y: 2.0))
+        arcPath.curve(to: NSPoint(x: 5.3, y: 5.3), controlPoint1: NSPoint(x: 6.5, y: 3.5), controlPoint2: NSPoint(x: 6.0, y: 4.5))
         arcPath.stroke()
         
         image.unlockFocus()
