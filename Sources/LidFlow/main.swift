@@ -76,20 +76,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         image.isTemplate = true
         image.lockFocus()
         
+        // Draw main angle frame (arms)
         let path = NSBezierPath()
         path.lineWidth = 1.8
         path.lineCapStyle = .round
         path.lineJoinStyle = .round
         
-        // Draw the angle: starts from top-right, goes to bottom-left (vertex), then to bottom-right
         path.move(to: NSPoint(x: 12, y: 11))
         path.line(to: NSPoint(x: 2, y: 2))
         path.line(to: NSPoint(x: 12, y: 2))
-        
-        // Curved indicator arc (radius 5.0, from 0 degrees to 45 degrees)
-        path.appendArc(withCenter: NSPoint(x: 2, y: 2), radius: 5.0, startAngle: 0.0, endAngle: 45.0)
-        
         path.stroke()
+        
+        // Draw the curved arc indicator separately to prevent connecting-line rendering bugs
+        let arcPath = NSBezierPath()
+        arcPath.lineWidth = 1.3
+        arcPath.lineCapStyle = .round
+        arcPath.appendArc(withCenter: NSPoint(x: 2, y: 2), radius: 5.0, startAngle: 0.0, endAngle: 45.0)
+        arcPath.stroke()
         
         image.unlockFocus()
         return image
