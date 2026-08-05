@@ -2,7 +2,6 @@ import SwiftUI
 
 struct LidFlowView: View {
     @StateObject private var sensor = LidSensor()
-    @State private var lastAngle: Double = 0.0
     @State private var doorSoundsEnabled = true
     @State private var thereminEnabled = false
     @State private var doorVolume: Double = 0.5
@@ -49,23 +48,6 @@ struct LidFlowView: View {
         }
         .onDisappear {
             sensor.stopMonitoring()
-        }
-        .onChange(of: sensor.angle) { newAngle in
-            let delta = newAngle - lastAngle
-            lastAngle = newAngle
-            
-            // Trigger door sounds on transitions
-            // Door opening: goes from 0 up
-            if lastAngle <= 5.0 && newAngle > 5.0 {
-                SoundSynth.shared.playOpenSound()
-            }
-            // Door closing: goes down to 0
-            if lastAngle > 5.0 && newAngle <= 5.0 {
-                SoundSynth.shared.playCloseSound()
-            }
-            
-            // Update Theremin synth parameters
-            SoundSynth.shared.updateTheremin(angle: newAngle, deltaAngle: delta)
         }
     }
 }

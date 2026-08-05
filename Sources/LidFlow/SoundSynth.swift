@@ -54,6 +54,7 @@ class SoundSynth {
         
         do {
             creakPlayer = try AVAudioPlayer(data: creakWav)
+            creakPlayer?.enableRate = true // Enable variable rate play
             creakPlayer?.prepareToPlay()
             creakPlayer?.volume = doorSoundVolume
             
@@ -94,13 +95,17 @@ class SoundSynth {
             guard let self = self else { return noErr }
             
             let abl = UnsafeMutableAudioBufferListPointer(outputData)
-            let bufferPointer = abl.first
-            let buf = UnsafeMutableBufferPointer<Float>(bufferPointer!)
+            let numChannels = abl.count
             
             for frame in 0..<Int(frameCount) {
+                // Audio-thread self-decay:
+                // Prevents the Theremin from playing continuously when stationary,
+                // even when the OS doesn't call onChange (because the screen is still).
+                self.targetAmplitude *= 0.9997
+                
                 // Interpolate frequency and amplitude to prevent clicks/pop sounds
-                self.currentFrequency += (self.targetFrequency - self.currentFrequency) * 0.005
-                self.currentAmplitude += (self.targetAmplitude - self.currentAmplitude) * 0.01
+                self.currentFrequency += (self.targetFrequency - self.currentFrequency) * 0.001
+                self.currentAmplitude += (self.targetAmplitude - self.currentAmplitude) * 0.002
                 
                 let t = self.phase / sampleRate
                 let freq = self.currentFrequency
@@ -109,19 +114,21 @@ class SoundSynth {
                 var signal = 0.0
                 switch self.oscillatorType {
                 case "Triangle":
-                    // Triangle wave: goes linearly -1 to 1 and back
                     signal = 2.0 * abs(2.0 * (t * freq - floor(t * freq + 0.5))) - 1.0
                 case "Sawtooth":
-                    // Sawtooth wave: goes linearly -1 to 1
                     signal = 2.0 * (t * freq - floor(t * freq + 0.5))
                 default: // Sine
                     signal = sin(2.0 * Double.pi * freq * t)
                 }
                 
-                buf[frame] = Float(signal * amp)
-                self.phase += 1.0
+                let sampleValue = Float(signal * amp)
+                // Fill all channels to prevent channel buzzing/muting in stereo
+                for channel in 0..<numChannels {
+                    let buf = UnsafeMutableBufferPointer<Float>(abl[channel])
+                    buf[frame] = sampleValue
+                }
                 
-                // Wrap phase to prevent numerical overflow
+                self.phase += 1.0
                 if self.phase >= sampleRate * 100.0 {
                     self.phase = 0.0
                 }
@@ -153,9 +160,6 @@ class SoundSynth {
     func updateTheremin(angle: Double, deltaAngle: Double) {
         guard isThereminEnabled else { return }
         
-        // 1. Map Lid Angle to Target Frequency (Pitch)
-        // MacBook open angle is normally 0° to 135°.
-        // We map 10° to 135° -> 150Hz to 1100Hz (playable frequency range)
         let minAngle = 10.0
         let maxAngle = 135.0
         let clampedAngle = max(minAngle, min(maxAngle, angle))
@@ -165,15 +169,61 @@ class SoundSynth {
         let progress = (clampedAngle - minAngle) / (maxAngle - minAngle)
         targetFrequency = minFreq + (maxFreq - minFreq) * progress
         
-        // 2. Map screen movement speed (deltaAngle) to volume amplitude
-        // If the screen is moving fast, play louder. If it's still, decay the sound to a quiet hum or silence.
-        let movementIntensity = min(1.0, abs(deltaAngle) * 5.0) // normalize velocity
+        let movementIntensity = min(1.0, abs(deltaAngle) * 5.0)
         
-        if movementIntensity > 0.02 {
+        // If movement is detected, set target amplitude to high
+        if movementIntensity > 0.01 {
             targetAmplitude = 0.15 + (movementIntensity * 0.45)
+        }
+    }
+    
+    // MARK: - Real-time Door sounds on lid move
+    private var hasSlammed = false
+    
+    func updateLidMove(angle: Double, deltaAngle: Double) {
+        guard isDoorSoundsEnabled else {
+            creakPlayer?.stop()
+            return
+        }
+        
+        // Reset slam flag when screen is opened past 15 degrees
+        if angle > 15.0 {
+            hasSlammed = false
+        }
+        
+        let absDelta = abs(deltaAngle)
+        
+        // Dynamic creak playback based on lid motion speed
+        if absDelta > 0.02 {
+            if let player = creakPlayer {
+                if !player.isPlaying {
+                    player.numberOfLoops = -1
+                    player.volume = 0.0
+                    player.play()
+                }
+                
+                // Map speed to play rate and volume dynamically
+                let targetRate = min(1.8, max(0.6, Float(absDelta * 12.0)))
+                let targetVol = min(doorSoundVolume, Float(absDelta * 5.0) * doorSoundVolume)
+                
+                player.rate = targetRate
+                player.volume = targetVol
+            }
         } else {
-            // Decay to silence when MacBook is stationary
-            targetAmplitude = max(0.0, targetAmplitude - 0.05)
+            // Decay creak volume when still
+            if let player = creakPlayer, player.isPlaying {
+                player.volume = max(0.0, player.volume - 0.08)
+                if player.volume == 0.0 {
+                    player.pause()
+                }
+            }
+        }
+        
+        // Trigger door slam sound when the lid closes to a low angle
+        if angle < 8.0 && deltaAngle < 0 && !hasSlammed {
+            hasSlammed = true
+            creakPlayer?.stop() // stop creaking immediately on slam
+            playCloseSound()
         }
     }
     

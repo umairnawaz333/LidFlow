@@ -47,6 +47,8 @@ class LidSensor: ObservableObject {
         print("Lid Sensor connected successfully")
     }
     
+    private var lastAngle: Double = 0.0
+    
     func startMonitoring() {
         guard device != nil else { return }
         
@@ -79,38 +81,48 @@ class LidSensor: ObservableObject {
             &reportLength
         )
         
+        var decodedAngle: Double? = nil
+        
         if result == kIOReturnSuccess && reportLength >= 3 {
             let rawValue = UInt16(report[1]) | (UInt16(report[2]) << 8)
-            let decodedAngle = Double(rawValue) * 0.01
-            if decodedAngle >= 0 && decodedAngle <= 360 {
-                DispatchQueue.main.async {
-                    self.angle = decodedAngle
+            let val = Double(rawValue) * 0.01
+            if val >= 0 && val <= 360 {
+                decodedAngle = val
+            }
+        } else {
+            // Fallback to Report ID 1 (integer precision or legacy centidegrees)
+            reportLength = CFIndex(8)
+            result = IOHIDDeviceGetReport(
+                device,
+                kIOHIDReportTypeFeature,
+                1,
+                &report,
+                &reportLength
+            )
+            
+            if result == kIOReturnSuccess && reportLength >= 3 {
+                let rawValue = UInt16(report[1]) | (UInt16(report[2]) << 8)
+                var val = Double(rawValue)
+                if rawValue > 360 {
+                    val = Double(rawValue) * 0.01
                 }
-                return
+                if val >= 0 && val <= 360 {
+                    decodedAngle = val
+                }
             }
         }
         
-        // Fallback to Report ID 1 (integer precision or legacy centidegrees)
-        reportLength = CFIndex(8)
-        result = IOHIDDeviceGetReport(
-            device,
-            kIOHIDReportTypeFeature,
-            1,
-            &report,
-            &reportLength
-        )
-        
-        if result == kIOReturnSuccess && reportLength >= 3 {
-            let rawValue = UInt16(report[1]) | (UInt16(report[2]) << 8)
-            var decodedAngle = Double(rawValue)
-            if rawValue > 360 {
-                decodedAngle = Double(rawValue) * 0.01
-            }
-            if decodedAngle >= 0 && decodedAngle <= 360 {
-                DispatchQueue.main.async {
-                    self.angle = decodedAngle
-                }
-            }
+        // Dispatch updates
+        DispatchQueue.main.async {
+            let current = decodedAngle ?? self.angle
+            let delta = current - self.lastAngle
+            self.lastAngle = current
+            
+            self.angle = current
+            
+            // Trigger audio controllers with real-time delta (including 0 when stationary)
+            SoundSynth.shared.updateTheremin(angle: current, deltaAngle: delta)
+            SoundSynth.shared.updateLidMove(angle: current, deltaAngle: delta)
         }
     }
 }
