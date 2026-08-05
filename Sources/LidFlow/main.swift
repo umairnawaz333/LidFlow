@@ -70,13 +70,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     // MARK: - Menu Bar Setup & Actions
+    private func createAngleImage() -> NSImage {
+        let size = NSSize(width: 14, height: 14)
+        let image = NSImage(size: size)
+        image.isTemplate = true
+        image.lockFocus()
+        
+        let path = NSBezierPath()
+        path.lineWidth = 1.8
+        path.lineCapStyle = .round
+        path.lineJoinStyle = .round
+        
+        // Draw the angle: starts from top-right, goes to bottom-left (vertex), then to bottom-right
+        path.move(to: NSPoint(x: 12, y: 11))
+        path.line(to: NSPoint(x: 2, y: 2))
+        path.line(to: NSPoint(x: 12, y: 2))
+        
+        // Curved indicator arc (radius 5.0, from 0 degrees to 45 degrees)
+        path.appendArc(withCenter: NSPoint(x: 2, y: 2), radius: 5.0, startAngle: 0.0, endAngle: 45.0)
+        
+        path.stroke()
+        
+        image.unlockFocus()
+        return image
+    }
+
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         guard let button = statusItem?.button else { return }
         
+        // Set the custom drawn bold angle icon image and align it to the left of the text
+        button.image = createAngleImage()
+        button.imagePosition = .imageLeft
+        
         // Use a semibold monospaced digit system font so values look bold and stable (no horizontal wiggling)
         button.font = NSFont.monospacedDigitSystemFont(ofSize: 13.5, weight: .semibold)
-        button.title = "∡ 0°"
+        button.title = "0°"
         
         let menu = NSMenu()
         
@@ -140,8 +169,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     private func updateMenuBar(angle: Double) {
         if let button = statusItem?.button {
-            // Use Measured Angle with Arc symbol '∡', rounded to the nearest integer (e.g. 116.7 -> 117)
-            button.title = String(format: "∡ %.0f°", round(angle))
+            // Rounded to the nearest integer (e.g. 116.7 -> 117)
+            button.title = String(format: "%.0f°", round(angle))
         }
         
         // Sync menu item checkmarks with the shared state (in case they were changed in the main UI)
