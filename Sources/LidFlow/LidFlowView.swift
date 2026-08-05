@@ -63,7 +63,7 @@ struct VisualizerCanvas: View {
                         Circle()
                             .fill(isConnected ? Color.green : Color.red)
                             .frame(width: 6, height: 6)
-                        Text(isConnected ? "Connected" : "Offline")
+                        Text(isConnected ? "Sensor Connected" : "Sensor Not Connected")
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
@@ -274,29 +274,18 @@ struct DoorSoundsCard: View {
             }
             
             if enabled {
-                VStack(spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "speaker.wave.1")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: 11))
-                        
-                        Slider(value: $volume, in: 0...1) { _ in
-                            SoundSynth.shared.doorSoundVolume = Float(volume)
-                        }
-                        
-                        Image(systemName: "speaker.wave.3")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: 11))
+                HStack(spacing: 8) {
+                    Image(systemName: "speaker.wave.1")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 11))
+                    
+                    Slider(value: $volume, in: 0...1) { _ in
+                        SoundSynth.shared.doorSoundVolume = Float(volume)
                     }
                     
-                    // Demo sound triggers
-                    Button(action: { SoundSynth.shared.playOpenSound() }) {
-                        Text("Test Creak")
-                            .font(.system(size: 10, weight: .medium))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    Image(systemName: "speaker.wave.3")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 11))
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
