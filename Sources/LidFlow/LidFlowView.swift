@@ -34,9 +34,6 @@ struct LidFlowView: View {
             .padding(.horizontal)
             
             Spacer()
-            
-            // Footer
-            FooterView()
         }
         .padding(.vertical, 16)
         .frame(
@@ -341,16 +338,4 @@ struct ThereminCard: View {
     }
 }
 
-// MARK: - Footer
-struct FooterView: View {
-    var body: some View {
-        VStack(spacing: 4) {
-            Text("Interactive MacBook Hinge Controller")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(.secondary)
-            Text("Close lid to play Slam / Move lid to play Theremin & Creak")
-                .font(.system(size: 9))
-                .foregroundColor(.secondary.opacity(0.8))
-        }
-    }
-}
+
