@@ -76,83 +76,84 @@ struct VisualizerCanvas: View {
             
             Spacer()
             
-            // Center Metrics Display
-            VStack(spacing: 6) {
-                // Large blue angle text matching custom design (bright neon blue)
-                Text(String(format: "%.1f°", angle))
-                    .font(.system(size: 84, weight: .thin, design: .rounded))
-                    .foregroundColor(Color(red: 0.0, green: 0.5, blue: 1.0))
-                
-                // Speed & Lid status
-                VStack(spacing: 4) {
-                    Text(String(format: "Velocity: %02d deg/s", Int(round(speed))))
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundColor(.secondary)
+            // Integrated Metrics and Hinge Graphic Center Group
+            VStack(spacing: 36) {
+                VStack(spacing: 6) {
+                    // Large blue angle text matching custom design (bright neon blue)
+                    Text(String(format: "%.1f°", angle))
+                        .font(.system(size: 84, weight: .thin, design: .rounded))
+                        .foregroundColor(Color(red: 0.0, green: 0.5, blue: 1.0))
                     
-                    Text(getLidStateText(angle: angle))
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.secondary.opacity(0.8))
-                        .tracking(1)
+                    // Speed & Lid status
+                    VStack(spacing: 4) {
+                        Text(String(format: "Velocity: %02d deg/s", Int(round(speed))))
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundColor(.secondary)
+                        
+                        Text(getLidStateText(angle: angle))
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.secondary.opacity(0.8))
+                            .tracking(1)
+                    }
                 }
+                
+                // Physical Simulated Hinge Graphic (Tuned to fit nicely and stays grouped with metrics!)
+                ZStack(alignment: .bottomLeading) {
+                    // Lower Body (Base)
+                    ZStack(alignment: .bottomLeading) {
+                        // Rubber feet
+                        HStack {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(Color.primary.opacity(0.8))
+                                .frame(width: 8, height: 1.5)
+                            Spacer()
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(Color.primary.opacity(0.8))
+                                .frame(width: 8, height: 1.5)
+                        }
+                        .frame(width: 80)
+                        .offset(x: 10, y: 5)
+                        
+                        // Tapered Chassis
+                        MacBookBase()
+                            .fill(LinearGradient(colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.08)], startPoint: .top, endPoint: .bottom))
+                            .frame(width: 100, height: 5)
+                    }
+                    .offset(x: 10, y: 0)
+                    
+                    // Screen (Lid) - rotates around the bottom leading edge
+                    ZStack(alignment: .leading) {
+                        // Aluminum back
+                        RoundedRectangle(cornerRadius: 1.2)
+                            .fill(LinearGradient(colors: [Color.primary.opacity(0.4), Color.primary.opacity(0.2)], startPoint: .top, endPoint: .bottom))
+                            .frame(width: 95, height: 3.0)
+                        
+                        // Glass bezel
+                        RoundedRectangle(cornerRadius: 0.8)
+                            .fill(Color.primary.opacity(0.85))
+                            .frame(width: 93, height: 1.8)
+                            .offset(x: 1, y: 0.6)
+                        
+                        // Glowing screen active line
+                        RoundedRectangle(cornerRadius: 0.4)
+                            .fill(LinearGradient(colors: [Color(red: 0.0, green: 0.5, blue: 1.0), Color.cyan], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: 90, height: 1.0)
+                            .offset(x: 2, y: 1.0)
+                            .opacity(angle > 3.0 ? 1.0 : 0.0)
+                    }
+                    .rotationEffect(.degrees(-angle), anchor: .leading)
+                    .offset(x: 10, y: -3.5)
+                    
+                    // Hinge Joint pin
+                    Circle()
+                        .fill(Color.primary.opacity(0.9))
+                        .frame(width: 6, height: 6)
+                        .offset(x: 7, y: -2)
+                }
+                .frame(width: 120, height: 100)
             }
             
             Spacer()
-            
-            // Physical Simulated Hinge Graphic (Tuned to fit nicely)
-            ZStack(alignment: .bottomLeading) {
-                // Lower Body (Base)
-                ZStack(alignment: .bottomLeading) {
-                    // Rubber feet
-                    HStack {
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(Color.primary.opacity(0.8))
-                            .frame(width: 8, height: 1.5)
-                        Spacer()
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(Color.primary.opacity(0.8))
-                            .frame(width: 8, height: 1.5)
-                    }
-                    .frame(width: 80)
-                    .offset(x: 10, y: 5)
-                    
-                    // Tapered Chassis
-                    MacBookBase()
-                        .fill(LinearGradient(colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.08)], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 100, height: 5)
-                }
-                .offset(x: 10, y: 0)
-                
-                // Screen (Lid) - rotates around the bottom leading edge
-                ZStack(alignment: .leading) {
-                    // Aluminum back
-                    RoundedRectangle(cornerRadius: 1.2)
-                        .fill(LinearGradient(colors: [Color.primary.opacity(0.4), Color.primary.opacity(0.2)], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 95, height: 3.0)
-                    
-                    // Glass bezel
-                    RoundedRectangle(cornerRadius: 0.8)
-                        .fill(Color.primary.opacity(0.85))
-                        .frame(width: 93, height: 1.8)
-                        .offset(x: 1, y: 0.6)
-                    
-                    // Glowing screen active line
-                    RoundedRectangle(cornerRadius: 0.4)
-                        .fill(LinearGradient(colors: [Color(red: 0.0, green: 0.5, blue: 1.0), Color.cyan], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: 90, height: 1.0)
-                        .offset(x: 2, y: 1.0)
-                        .opacity(angle > 3.0 ? 1.0 : 0.0)
-                }
-                .rotationEffect(.degrees(-angle), anchor: .leading)
-                .offset(x: 10, y: -3.5)
-                
-                // Hinge Joint pin
-                Circle()
-                    .fill(Color.primary.opacity(0.9))
-                    .frame(width: 6, height: 6)
-                    .offset(x: 7, y: -2)
-            }
-            .frame(width: 120, height: 100)
-            .padding(.bottom, 32)
         }
         .background(Color.black.opacity(0.15))
     }
