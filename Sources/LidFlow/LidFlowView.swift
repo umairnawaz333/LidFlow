@@ -39,7 +39,10 @@ struct LidFlowView: View {
             FooterView()
         }
         .padding(.vertical, 16)
-        .frame(width: 380, height: 660)
+        .frame(
+            minWidth: 320, idealWidth: 380, maxWidth: .infinity,
+            minHeight: 550, idealHeight: 660, maxHeight: .infinity
+        )
         .onAppear {
             sensor.startMonitoring()
             // Set initial volumes
