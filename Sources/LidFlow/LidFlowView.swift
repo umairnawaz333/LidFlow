@@ -220,7 +220,7 @@ struct ControlSidebar: View {
                 .background(Color.primary.opacity(0.06))
             
             // Scrollable Settings Cards
-            ScrollView(.vertical, showsIndicators: false) {
+            ScrollView(.vertical, showsIndicators: true) {
                 VStack(spacing: 16) {
                     DoorSoundsCard(
                         enabled: $doorSoundsEnabled,
