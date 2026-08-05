@@ -94,7 +94,7 @@ struct VisualizerCanvas: View {
             Spacer()
             
             // Integrated Metrics and Hinge Graphic Center Group
-            VStack(spacing: 36) {
+            VStack(spacing: 60) {
                 VStack(spacing: 6) {
                     // Large blue angle text matching custom design (bright neon blue)
                     Text(String(format: "%.1f°", angle))
@@ -114,7 +114,7 @@ struct VisualizerCanvas: View {
                     }
                 }
                 
-                // Physical Simulated Hinge Graphic (Tuned to fit nicely and stays grouped with metrics!)
+                // Physical Simulated Hinge Graphic (Scaled down to fit cleanly with plenty of space)
                 ZStack(alignment: .bottomLeading) {
                     // Lower Body (Base)
                     ZStack(alignment: .bottomLeading) {
@@ -122,52 +122,52 @@ struct VisualizerCanvas: View {
                         HStack {
                             RoundedRectangle(cornerRadius: 1)
                                 .fill(Color.primary.opacity(0.8))
-                                .frame(width: 8, height: 1.5)
+                                .frame(width: 6, height: 1.2)
                             Spacer()
                             RoundedRectangle(cornerRadius: 1)
                                 .fill(Color.primary.opacity(0.8))
-                                .frame(width: 8, height: 1.5)
+                                .frame(width: 6, height: 1.2)
                         }
-                        .frame(width: 80)
-                        .offset(x: 10, y: 5)
+                        .frame(width: 65)
+                        .offset(x: 10, y: 4)
                         
                         // Tapered Chassis
                         MacBookBase()
                             .fill(LinearGradient(colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.08)], startPoint: .top, endPoint: .bottom))
-                            .frame(width: 100, height: 5)
+                            .frame(width: 85, height: 4.5)
                     }
                     .offset(x: 10, y: 0)
                     
                     // Screen (Lid) - rotates around the bottom leading edge
                     ZStack(alignment: .leading) {
                         // Aluminum back
-                        RoundedRectangle(cornerRadius: 1.2)
+                        RoundedRectangle(cornerRadius: 1.0)
                             .fill(LinearGradient(colors: [Color.primary.opacity(0.4), Color.primary.opacity(0.2)], startPoint: .top, endPoint: .bottom))
-                            .frame(width: 95, height: 3.0)
+                            .frame(width: 80, height: 2.8)
                         
                         // Glass bezel
-                        RoundedRectangle(cornerRadius: 0.8)
+                        RoundedRectangle(cornerRadius: 0.6)
                             .fill(Color.primary.opacity(0.85))
-                            .frame(width: 93, height: 1.8)
+                            .frame(width: 78, height: 1.6)
                             .offset(x: 1, y: 0.6)
                         
                         // Glowing screen active line
-                        RoundedRectangle(cornerRadius: 0.4)
+                        RoundedRectangle(cornerRadius: 0.3)
                             .fill(LinearGradient(colors: [Color(red: 0.0, green: 0.5, blue: 1.0), Color.cyan], startPoint: .leading, endPoint: .trailing))
-                            .frame(width: 90, height: 1.0)
-                            .offset(x: 2, y: 1.0)
+                            .frame(width: 75, height: 0.9)
+                            .offset(x: 2, y: 0.9)
                             .opacity(angle > 3.0 ? 1.0 : 0.0)
                     }
                     .rotationEffect(.degrees(-angle), anchor: .leading)
-                    .offset(x: 10, y: -3.5)
+                    .offset(x: 10, y: -3.0)
                     
                     // Hinge Joint pin
                     Circle()
                         .fill(Color.primary.opacity(0.9))
-                        .frame(width: 6, height: 6)
-                        .offset(x: 7, y: -2)
+                        .frame(width: 5, height: 5)
+                        .offset(x: 7, y: -1.8)
                 }
-                .frame(width: 120, height: 100)
+                .frame(width: 100, height: 85)
             }
             
             Spacer()
