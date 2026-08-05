@@ -70,26 +70,42 @@ class LidSensor: ObservableObject {
         var report = [UInt8](repeating: 0, count: 8)
         var reportLength = CFIndex(8)
         
-        let result = IOHIDDeviceGetReport(
+        // Try Report ID 7 first (centidegrees precision, e.g. 122.73)
+        var result = IOHIDDeviceGetReport(
             device,
             kIOHIDReportTypeFeature,
-            1, // Report ID 1
+            7,
             &report,
             &reportLength
         )
         
         if result == kIOReturnSuccess && reportLength >= 3 {
             let rawValue = UInt16(report[1]) | (UInt16(report[2]) << 8)
-            
-            // Adaptive decoding:
-            // Some MacBooks report in degrees (e.g. 122 -> 122°)
-            // Others report in centidegrees (e.g. 12200 -> 122.00°)
+            let decodedAngle = Double(rawValue) * 0.01
+            if decodedAngle >= 0 && decodedAngle <= 360 {
+                DispatchQueue.main.async {
+                    self.angle = decodedAngle
+                }
+                return
+            }
+        }
+        
+        // Fallback to Report ID 1 (integer precision or legacy centidegrees)
+        reportLength = CFIndex(8)
+        result = IOHIDDeviceGetReport(
+            device,
+            kIOHIDReportTypeFeature,
+            1,
+            &report,
+            &reportLength
+        )
+        
+        if result == kIOReturnSuccess && reportLength >= 3 {
+            let rawValue = UInt16(report[1]) | (UInt16(report[2]) << 8)
             var decodedAngle = Double(rawValue)
             if rawValue > 360 {
                 decodedAngle = Double(rawValue) * 0.01
             }
-            
-            // Bounds check for safety (macOS screen hinge normally is 0 to 145 degrees)
             if decodedAngle >= 0 && decodedAngle <= 360 {
                 DispatchQueue.main.async {
                     self.angle = decodedAngle
