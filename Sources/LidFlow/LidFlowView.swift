@@ -38,7 +38,7 @@ struct LidFlowView: View {
             // Footer
             FooterView()
         }
-        .frame(width: 380, height: 530)
+        .frame(width: 380, height: 600)
         .padding(.vertical, 16)
         .onAppear {
             sensor.startMonitoring()
@@ -95,9 +95,9 @@ struct MacBookBase: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         path.move(to: CGPoint(x: rect.minX, y: rect.minY + 1))
-        path.addLine(to: CGPoint(x: rect.maxX - 12, y: rect.minY + 4))
-        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.maxY), control: CGPoint(x: rect.maxX, y: rect.minY + 4))
-        path.addLine(to: CGPoint(x: rect.minX + 4, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX - 10, y: rect.minY + 3.5))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.maxY), control: CGPoint(x: rect.maxX, y: rect.minY + 3.5))
+        path.addLine(to: CGPoint(x: rect.minX + 3, y: rect.maxY))
         path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.minY + 1), control: CGPoint(x: rect.minX, y: rect.maxY))
         return path
     }
@@ -109,7 +109,7 @@ struct VisualizerPanel: View {
     let speed: Double
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             // Large Centered Display
             VStack(spacing: 4) {
                 Text(String(format: "%.1f°", angle))
@@ -136,10 +136,10 @@ struct VisualizerPanel: View {
                     .padding(.top, 6)
             }
             
-            // Large spacer to prevent screen lid overlapping with text
-            Spacer(minLength: 32)
+            // Large padding to prevent screen lid overlapping with text
+            Spacer(minLength: 40)
             
-            // Dynamic Laptop Graphic
+            // Dynamic Laptop Graphic (Resized to fit nicely inside frame)
             ZStack(alignment: .bottomLeading) {
                 // Lower Body (Base)
                 ZStack(alignment: .bottomLeading) {
@@ -147,52 +147,52 @@ struct VisualizerPanel: View {
                     HStack {
                         RoundedRectangle(cornerRadius: 1)
                             .fill(Color.primary.opacity(0.8))
-                            .frame(width: 10, height: 2)
+                            .frame(width: 8, height: 1.5)
                         Spacer()
                         RoundedRectangle(cornerRadius: 1)
                             .fill(Color.primary.opacity(0.8))
-                            .frame(width: 10, height: 2)
+                            .frame(width: 8, height: 1.5)
                     }
-                    .frame(width: 120)
-                    .offset(x: 10, y: 7)
+                    .frame(width: 80)
+                    .offset(x: 10, y: 5)
                     
                     // Tapered Chassis
                     MacBookBase()
                         .fill(LinearGradient(colors: [Color.primary.opacity(0.18), Color.primary.opacity(0.08)], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 140, height: 6)
+                        .frame(width: 100, height: 5)
                 }
                 .offset(x: 10, y: 0)
                 
                 // Screen (Lid) - rotates around the bottom leading edge
                 ZStack(alignment: .leading) {
                     // Aluminum back
-                    RoundedRectangle(cornerRadius: 1.5)
+                    RoundedRectangle(cornerRadius: 1.2)
                         .fill(LinearGradient(colors: [Color.primary.opacity(0.4), Color.primary.opacity(0.2)], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 135, height: 3.5)
+                        .frame(width: 95, height: 3.0)
                     
                     // Glass bezel
-                    RoundedRectangle(cornerRadius: 1)
+                    RoundedRectangle(cornerRadius: 0.8)
                         .fill(Color.primary.opacity(0.85))
-                        .frame(width: 133, height: 2.2)
+                        .frame(width: 93, height: 1.8)
                         .offset(x: 1, y: 0.6)
                     
                     // Glowing screen active line
-                    RoundedRectangle(cornerRadius: 0.5)
+                    RoundedRectangle(cornerRadius: 0.4)
                         .fill(LinearGradient(colors: [Color.blue, Color.cyan], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: 130, height: 1.2)
-                        .offset(x: 2, y: 1.1)
+                        .frame(width: 90, height: 1.0)
+                        .offset(x: 2, y: 1.0)
                         .opacity(angle > 3.0 ? 1.0 : 0.0)
                 }
                 .rotationEffect(.degrees(-angle), anchor: .leading)
-                .offset(x: 10, y: -4)
+                .offset(x: 10, y: -3.5)
                 
                 // Hinge Joint pin
                 Circle()
                     .fill(Color.primary.opacity(0.9))
-                    .frame(width: 8, height: 8)
-                    .offset(x: 6, y: -2)
+                    .frame(width: 6, height: 6)
+                    .offset(x: 7, y: -2)
             }
-            .frame(width: 160, height: 140)
+            .frame(width: 120, height: 100)
             .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity)
