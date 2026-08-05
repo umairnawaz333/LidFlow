@@ -9,7 +9,7 @@ struct LidFlowView: View {
     @State private var oscillatorType = "Sine"
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 22) {
             // Header
             HeaderView(isConnected: sensor.isConnected)
             
@@ -38,7 +38,7 @@ struct LidFlowView: View {
             // Footer
             FooterView()
         }
-        .frame(width: 380, height: 600)
+        .frame(width: 380, height: 620)
         .padding(.vertical, 16)
         .onAppear {
             sensor.startMonitoring()
