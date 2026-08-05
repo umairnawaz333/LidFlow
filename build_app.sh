@@ -16,6 +16,11 @@ mkdir -p LidFlow.app/Contents/MacOS
 # Copy binary
 cp .build/release/LidFlow LidFlow.app/Contents/MacOS/LidFlow
 
+# Create Resources directory and package assets
+mkdir -p LidFlow.app/Contents/Resources
+cp creak_loop.wav LidFlow.app/Contents/Resources/creak_loop.wav
+cp logo.jpg LidFlow.app/Contents/Resources/logo.jpg
+
 # Create Info.plist
 cat <<EOF > LidFlow.app/Contents/Info.plist
 <?xml version="1.0" encoding="UTF-8"?>

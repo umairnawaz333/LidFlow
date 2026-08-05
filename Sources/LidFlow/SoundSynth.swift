@@ -47,17 +47,38 @@ class SoundSynth {
         setupThereminEngine()
     }
     
-    // MARK: - Door Sounds Setup & Playback
     private func setupDoorSounds() {
-        let creakWav = generateDoorCreakWav()
-        let slamWav = generateDoorSlamWav()
+        var creakPlayerInitialized = false
         
+        // Attempt to load premium recorded creak sound from App Bundle Resources
+        if let url = Bundle.main.url(forResource: "creak_loop", withExtension: "wav") {
+            do {
+                creakPlayer = try AVAudioPlayer(contentsOf: url)
+                creakPlayerInitialized = true
+                print("Successfully loaded premium creak_loop.wav from bundle resources")
+            } catch {
+                print("Failed to load creak_loop.wav from bundle: \(error)")
+            }
+        }
+        
+        // Fallback to in-memory wave generator if bundle asset is not found
+        if !creakPlayerInitialized {
+            let creakWav = generateDoorCreakWav()
+            do {
+                creakPlayer = try AVAudioPlayer(data: creakWav)
+                print("Initialized fallback in-memory synthesized creak sound")
+            } catch {
+                print("Failed to initialize generated creak player: \(error)")
+            }
+        }
+        
+        creakPlayer?.enableRate = true
+        creakPlayer?.prepareToPlay()
+        creakPlayer?.volume = doorSoundVolume
+        
+        // Setup slam sound player
+        let slamWav = generateDoorSlamWav()
         do {
-            creakPlayer = try AVAudioPlayer(data: creakWav)
-            creakPlayer?.enableRate = true // Enable variable rate play
-            creakPlayer?.prepareToPlay()
-            creakPlayer?.volume = doorSoundVolume
-            
             slamPlayer = try AVAudioPlayer(data: slamWav)
             slamPlayer?.prepareToPlay()
             slamPlayer?.volume = doorSoundVolume

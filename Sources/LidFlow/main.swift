@@ -43,11 +43,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self?.updateMenuBar(angle: angle)
         }
         
-        // Set application Dock icon programmatically if logo.jpg is present
-        let iconPath = "logo.jpg"
-        if FileManager.default.fileExists(atPath: iconPath),
-           let iconImage = NSImage(contentsOfFile: iconPath) {
+        // Set application Dock icon programmatically from main bundle resources
+        if let iconURL = Bundle.main.url(forResource: "logo", withExtension: "jpg"),
+           let iconImage = NSImage(contentsOf: iconURL) {
             NSApplication.shared.applicationIconImage = iconImage
+        } else {
+            // Fallback to local path check
+            let iconPath = "logo.jpg"
+            if FileManager.default.fileExists(atPath: iconPath),
+               let iconImage = NSImage(contentsOfFile: iconPath) {
+                NSApplication.shared.applicationIconImage = iconImage
+            }
         }
     }
 
