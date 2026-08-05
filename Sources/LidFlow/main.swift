@@ -91,8 +91,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let arcPath = NSBezierPath()
         arcPath.lineWidth = 1.3
         arcPath.lineCapStyle = .round
-        arcPath.move(to: NSPoint(x: 6.8, y: 2.0))
-        arcPath.curve(to: NSPoint(x: 5.3, y: 5.3), controlPoint1: NSPoint(x: 6.5, y: 3.5), controlPoint2: NSPoint(x: 6.0, y: 4.5))
+        arcPath.move(to: NSPoint(x: 7.5, y: 2.0))
+        arcPath.curve(to: NSPoint(x: 5.9, y: 5.9), controlPoint1: NSPoint(x: 7.5, y: 3.8), controlPoint2: NSPoint(x: 7.0, y: 5.0))
         arcPath.stroke()
         
         image.unlockFocus()
