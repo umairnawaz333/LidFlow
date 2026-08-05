@@ -1,5 +1,9 @@
 # LidFlow 📐🚪🎵
 
+<p align="center">
+  <img src="logo.jpg" alt="LidFlow Logo" width="160" style="border-radius: 32px;">
+</p>
+
 **LidFlow** is a premium, lightweight macOS utility designed for MacBook models. It reads the raw data from the built-in MacBook lid angle sensor in real-time and converts physical hinge movements into custom synthesized audio feedback and animations.
 
 It features:

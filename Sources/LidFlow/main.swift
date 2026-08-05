@@ -42,6 +42,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         sensor.onAngleChange = { [weak self] angle in
             self?.updateMenuBar(angle: angle)
         }
+        
+        // Set application Dock icon programmatically if logo.jpg is present
+        let iconPath = "logo.jpg"
+        if FileManager.default.fileExists(atPath: iconPath),
+           let iconImage = NSImage(contentsOfFile: iconPath) {
+            NSApplication.shared.applicationIconImage = iconImage
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
