@@ -25,31 +25,11 @@ It features:
 
 ## 📥 Installation
 
-### Option 1: Local Installation (From Cloned Repository)
-
-If you have cloned this repository, you can install LidFlow as a system Cask using the local formula. 
-
-*Note: Since the cask definition in [`lidflow.rb`](file:///Users/umairnawaz/Projects/macbook-lid-project/lidflow.rb) references the GitHub release URL, the release must be published, or you can temporarily edit the `url` in [`lidflow.rb`](file:///Users/umairnawaz/Projects/macbook-lid-project/lidflow.rb) to point to your local `LidFlow.zip` (e.g. `url "file:///path/to/LidFlow.zip"`).*
+You can install LidFlow directly using Homebrew:
 
 ```bash
-# Install the cask from the local file
-brew install --cask ./lidflow.rb
+brew install --cask umairnawaz333/tap/lidflow
 ```
-
-### Option 2: Remote Installation (Via Homebrew Tap)
-
-Once you have created your public tap repository and published the release, anyone can install LidFlow directly from your tap:
-
-```bash
-# Add the tap
-brew tap umairnawaz333/tap
-
-# Install LidFlow Cask
-brew install --cask lidflow
-```
-
-* **Homebrew Tap Repository**: [umairnawaz333/homebrew-tap](https://github.com/umairnawaz333/homebrew-tap)
-* **Cask Definition**: [`lidflow.rb`](file:///Users/umairnawaz/Projects/macbook-lid-project/lidflow.rb)
 
 ---
 
