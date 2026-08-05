@@ -7,6 +7,7 @@ struct LidFlowView: View {
     @State private var doorVolume: Double = 0.5
     @State private var thereminVolume: Double = 0.3
     @State private var oscillatorType = "Sine"
+    @State private var isSidebarVisible = true
     
     var body: some View {
         HStack(spacing: 0) {
@@ -14,22 +15,26 @@ struct LidFlowView: View {
             VisualizerCanvas(
                 angle: sensor.angle,
                 speed: sensor.speed,
-                isConnected: sensor.isConnected
+                isConnected: sensor.isConnected,
+                isSidebarVisible: $isSidebarVisible
             )
             
-            Divider()
-                .background(Color.primary.opacity(0.1))
-            
-            // RIGHT PANE: Control Sidebar
-            ControlSidebar(
-                doorSoundsEnabled: $doorSoundsEnabled,
-                doorVolume: $doorVolume,
-                thereminEnabled: $thereminEnabled,
-                thereminVolume: $thereminVolume,
-                oscillatorType: $oscillatorType,
-                isConnected: sensor.isConnected
-            )
-            .frame(width: 320)
+            if isSidebarVisible {
+                Divider()
+                    .background(Color.primary.opacity(0.1))
+                
+                // RIGHT PANE: Control Sidebar
+                ControlSidebar(
+                    doorSoundsEnabled: $doorSoundsEnabled,
+                    doorVolume: $doorVolume,
+                    thereminEnabled: $thereminEnabled,
+                    thereminVolume: $thereminVolume,
+                    oscillatorType: $oscillatorType,
+                    isConnected: sensor.isConnected
+                )
+                .frame(width: 320)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
         }
         .frame(
             minWidth: 680, idealWidth: 750, maxWidth: .infinity,
@@ -51,6 +56,7 @@ struct VisualizerCanvas: View {
     let angle: Double
     let speed: Double
     let isConnected: Bool
+    @Binding var isSidebarVisible: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -62,13 +68,30 @@ struct VisualizerCanvas: View {
                 
                 Spacer()
                 
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(isConnected ? Color.green : Color.red)
-                        .frame(width: 6, height: 6)
-                    Text(isConnected ? "Sensor Connected" : "Sensor Offline")
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
+                HStack(spacing: 12) {
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(isConnected ? Color.green : Color.red)
+                            .frame(width: 6, height: 6)
+                        Text(isConnected ? "Connected" : "Offline")
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Button(action: {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                            isSidebarVisible.toggle()
+                        }
+                    }) {
+                        Image(systemName: isSidebarVisible ? "sidebar.right" : "sidebar.left")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(isSidebarVisible ? .accentColor : .secondary)
+                            .frame(width: 24, height: 24)
+                            .background(Color.primary.opacity(isSidebarVisible ? 0.08 : 0.03))
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .help(isSidebarVisible ? "Hide Sidebar" : "Show Sidebar")
                 }
             }
             .padding(.horizontal, 20)
