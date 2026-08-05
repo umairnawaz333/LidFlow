@@ -116,18 +116,33 @@ class LidSensor: ObservableObject {
         // Dispatch updates
         DispatchQueue.main.async {
             let current = decodedAngle ?? self.angle
-            let delta = current - self.lastAngle
-            self.lastAngle = current
             
-            self.angle = current
+            // Hysteresis Noise Gate:
+            // Physical sensors fluctuate by 0.01 - 0.03 degrees due to ADC noise.
+            // We ignore differences <= 0.08 degrees to freeze the UI and audio
+            // when the lid is stationary.
+            let diff = abs(current - self.angle)
+            var targetAngle = self.angle
+            var delta = 0.0
+            
+            if diff > 0.08 {
+                targetAngle = current
+                delta = current - self.lastAngle
+                self.lastAngle = current
+            } else {
+                // Stationary state
+                delta = 0.0
+            }
+            
+            self.angle = targetAngle
             
             // Calculate and smooth movement speed (degrees/second)
             let rawSpeed = abs(delta) / 0.05
             self.speed = self.speed * 0.75 + rawSpeed * 0.25
             
-            // Trigger audio controllers with real-time delta (including 0 when stationary)
-            SoundSynth.shared.updateTheremin(angle: current, deltaAngle: delta)
-            SoundSynth.shared.updateLidMove(angle: current, deltaAngle: delta)
+            // Trigger audio controllers with real-time delta
+            SoundSynth.shared.updateTheremin(angle: targetAngle, deltaAngle: delta)
+            SoundSynth.shared.updateLidMove(angle: targetAngle, deltaAngle: delta)
         }
     }
 }
