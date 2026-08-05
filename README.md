@@ -8,11 +8,11 @@
 
 It features:
 1. **Real-Time Hinge Visualizer**: Displays the exact hinge angle in degrees with a beautiful side-profile outline of a MacBook that folds and opens in sync with your actual lid.
-2. **LidDoor (Creaky Door Sounds)**: Plays a squeaking/creaking door sound as you open the lid, and a solid door slam when you close it (generated programmatically in memory on startup).
+2. **LidCreak (Creaky Hinge SFX)**: Plays a premium recorded squeaking/creaking door sound as you move the MacBook lid, dynamically mapping hinge speed to play rate and volume in real-time.
 3. **LidTheremin (Screen Synth)**: Turns your screen into a musical instrument. Adjusting the screen angle sweeps the pitch of a real-time synthesized sine, triangle, or sawtooth wave. Features volume decay when stationary.
 
 <p align="center">
-  <img src="screenshot.png" alt="LidFlow App Screenshot" width="380">
+  <img src="screenshot.png" alt="LidFlow App Screenshot" width="580">
 </p>
 
 <p align="center">
