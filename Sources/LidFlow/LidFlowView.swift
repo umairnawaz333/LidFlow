@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct LidFlowView: View {
-    @StateObject private var sensor = LidSensor()
-    @State private var doorSoundsEnabled = true
-    @State private var thereminEnabled = false
+    @ObservedObject private var sensor = LidSensor.shared
     @State private var doorVolume: Double = 0.5
     @State private var thereminVolume: Double = 0.3
     @State private var oscillatorType = "Sine"
@@ -25,9 +23,9 @@ struct LidFlowView: View {
                 
                 // RIGHT PANE: Control Sidebar
                 ControlSidebar(
-                    doorSoundsEnabled: $doorSoundsEnabled,
+                    doorSoundsEnabled: $sensor.doorSoundsEnabled,
                     doorVolume: $doorVolume,
-                    thereminEnabled: $thereminEnabled,
+                    thereminEnabled: $sensor.thereminEnabled,
                     thereminVolume: $thereminVolume,
                     oscillatorType: $oscillatorType,
                     isConnected: sensor.isConnected
@@ -41,12 +39,8 @@ struct LidFlowView: View {
             minHeight: 400, idealHeight: 480, maxHeight: .infinity
         )
         .onAppear {
-            sensor.startMonitoring()
             SoundSynth.shared.doorSoundVolume = Float(doorVolume)
             SoundSynth.shared.thereminVolume = Float(thereminVolume)
-        }
-        .onDisappear {
-            sensor.stopMonitoring()
         }
     }
 }

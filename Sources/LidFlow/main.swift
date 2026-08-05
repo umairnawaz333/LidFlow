@@ -3,8 +3,17 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var window: NSWindow!
+    private var statusItem: NSStatusItem?
+    
+    private var creakMenuItem: NSMenuItem?
+    private var thereminMenuItem: NSMenuItem?
+    private var showWindowMenuItem: NSMenuItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Start monitoring LidSensor singleton
+        let sensor = LidSensor.shared
+        sensor.startMonitoring()
+        
         // Build contents
         let contentView = LidFlowView()
         
@@ -25,10 +34,106 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // Ensure window is activated on front
         NSApplication.shared.activate(ignoringOtherApps: true)
+        
+        // Setup macOS Menu Bar Status Item (Menu Bar Extra)
+        setupStatusItem()
+        
+        // Listen to sensor angle updates to refresh menu bar title and menu states
+        sensor.onAngleChange = { [weak self] angle in
+            self?.updateMenuBar(angle: angle)
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return true
+        // Return false so the application keeps running in the menu bar even when window is closed!
+        return false
+    }
+    
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        // Just hide the window, don't destroy it!
+        window.orderOut(nil)
+        showWindowMenuItem?.title = "Show App Window"
+        return false
+    }
+
+    // MARK: - Menu Bar Setup & Actions
+    private func setupStatusItem() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        guard let button = statusItem?.button else { return }
+        
+        // Set initial state
+        button.title = "∠ 0°"
+        
+        let menu = NSMenu()
+        
+        // Sound Mode Header
+        let soundHeader = NSMenuItem(title: "Sound Mode", action: nil, keyEquivalent: "")
+        soundHeader.isEnabled = false
+        menu.addItem(soundHeader)
+        
+        // Creak option
+        let creakItem = NSMenuItem(title: "Creak", action: #selector(toggleCreak), keyEquivalent: "")
+        creakItem.state = LidSensor.shared.doorSoundsEnabled ? .on : .off
+        menu.addItem(creakItem)
+        self.creakMenuItem = creakItem
+        
+        // Theremin option
+        let thereminItem = NSMenuItem(title: "Theremin", action: #selector(toggleTheremin), keyEquivalent: "")
+        thereminItem.state = LidSensor.shared.thereminEnabled ? .on : .off
+        menu.addItem(thereminItem)
+        self.thereminMenuItem = thereminItem
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        // Show/Hide App Window
+        let showItem = NSMenuItem(title: "Hide App Window", action: #selector(toggleWindow), keyEquivalent: "")
+        menu.addItem(showItem)
+        self.showWindowMenuItem = showItem
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        // Quit option
+        let quitItem = NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q")
+        menu.addItem(quitItem)
+        
+        statusItem?.menu = menu
+    }
+    
+    @objc private func toggleCreak() {
+        LidSensor.shared.doorSoundsEnabled.toggle()
+        creakMenuItem?.state = LidSensor.shared.doorSoundsEnabled ? .on : .off
+    }
+    
+    @objc private func toggleTheremin() {
+        LidSensor.shared.thereminEnabled.toggle()
+        thereminMenuItem?.state = LidSensor.shared.thereminEnabled ? .on : .off
+    }
+    
+    @objc private func toggleWindow() {
+        if window.isVisible {
+            window.orderOut(nil)
+            showWindowMenuItem?.title = "Show App Window"
+        } else {
+            window.makeKeyAndOrderFront(nil)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+            showWindowMenuItem?.title = "Hide App Window"
+        }
+    }
+    
+    @objc private func quitApp() {
+        NSApplication.shared.terminate(nil)
+    }
+    
+    private func updateMenuBar(angle: Double) {
+        if let button = statusItem?.button {
+            // Round angle to nearest integer for menu bar display (e.g. 116.7° -> 117°)
+            button.title = String(format: "∠ %.0f°", round(angle))
+        }
+        
+        // Sync menu item checkmarks with the shared state (in case they were changed in the main UI)
+        creakMenuItem?.state = LidSensor.shared.doorSoundsEnabled ? .on : .off
+        thereminMenuItem?.state = LidSensor.shared.thereminEnabled ? .on : .off
+        showWindowMenuItem?.title = window.isVisible ? "Hide App Window" : "Show App Window"
     }
 }
 

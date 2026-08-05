@@ -3,15 +3,30 @@ import IOKit.hid
 import Combine
 
 class LidSensor: ObservableObject {
+    static let shared = LidSensor()
+    
     @Published var angle: Double = 0.0
     @Published var speed: Double = 0.0
     @Published var isConnected: Bool = false
+    
+    @Published var doorSoundsEnabled: Bool = true {
+        didSet {
+            SoundSynth.shared.isDoorSoundsEnabled = doorSoundsEnabled
+        }
+    }
+    @Published var thereminEnabled: Bool = false {
+        didSet {
+            SoundSynth.shared.isThereminEnabled = thereminEnabled
+        }
+    }
+    
+    var onAngleChange: ((Double) -> Void)?
     
     private var manager: IOHIDManager?
     private var device: IOHIDDevice?
     private var timer: Timer?
     
-    init() {
+    private init() {
         setupHID()
     }
     
@@ -143,6 +158,8 @@ class LidSensor: ObservableObject {
             // Trigger audio controllers with real-time delta
             SoundSynth.shared.updateTheremin(angle: targetAngle, deltaAngle: delta)
             SoundSynth.shared.updateLidMove(angle: targetAngle, deltaAngle: delta)
+            
+            self.onAngleChange?(targetAngle)
         }
     }
 }
