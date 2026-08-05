@@ -347,7 +347,7 @@ struct ThereminCard: View {
                             .font(.system(size: 11))
                     }
                     
-                    // Wave type picker
+                    // Wave type picker (dropdown style to prevent horizontal overflow)
                     HStack {
                         Text("Wave Type")
                             .font(.system(size: 11))
@@ -358,8 +358,8 @@ struct ThereminCard: View {
                                 Text(type).tag(type)
                             }
                         }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .frame(width: 170)
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 110)
                         .onChange(of: oscillatorType) { val in
                             SoundSynth.shared.oscillatorType = val
                         }
