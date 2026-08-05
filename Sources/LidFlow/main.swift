@@ -76,23 +76,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         image.isTemplate = true
         image.lockFocus()
         
-        // Draw main angle frame (arms)
+        // Draw main angle frame (arms match reference geometry: horizontal extends past the slanted arm)
         let path = NSBezierPath()
         path.lineWidth = 1.8
         path.lineCapStyle = .round
         path.lineJoinStyle = .round
         
-        path.move(to: NSPoint(x: 12, y: 11))
-        path.line(to: NSPoint(x: 2, y: 2))
-        path.line(to: NSPoint(x: 12, y: 2))
+        path.move(to: NSPoint(x: 10.5, y: 11.0))
+        path.line(to: NSPoint(x: 1.5, y: 2.0))
+        path.line(to: NSPoint(x: 12.5, y: 2.0))
         path.stroke()
         
-        // Draw the curved arc indicator using a Bezier curve to guarantee rendering across all macOS systems
+        // Draw the curved arc indicator matching reference proportions
         let arcPath = NSBezierPath()
         arcPath.lineWidth = 1.3
         arcPath.lineCapStyle = .round
-        arcPath.move(to: NSPoint(x: 7.5, y: 2.0))
-        arcPath.curve(to: NSPoint(x: 5.9, y: 5.9), controlPoint1: NSPoint(x: 7.5, y: 3.8), controlPoint2: NSPoint(x: 7.0, y: 5.0))
+        arcPath.move(to: NSPoint(x: 6.8, y: 2.0))
+        arcPath.curve(to: NSPoint(x: 5.3, y: 5.8), controlPoint1: NSPoint(x: 6.8, y: 3.8), controlPoint2: NSPoint(x: 6.2, y: 5.0))
         arcPath.stroke()
         
         image.unlockFocus()
@@ -107,8 +107,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         button.image = createAngleImage()
         button.imagePosition = .imageLeft
         
-        // Use a semibold monospaced digit system font so values look bold and stable (no horizontal wiggling)
-        button.font = NSFont.monospacedDigitSystemFont(ofSize: 13.5, weight: .semibold)
+        // Use a regular monospaced digit system font (size 13.0) to match native macOS menu bar weight perfectly
+        button.font = NSFont.monospacedDigitSystemFont(ofSize: 13.0, weight: .regular)
         button.title = "0°"
         
         let menu = NSMenu()
