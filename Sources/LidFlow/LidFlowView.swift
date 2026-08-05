@@ -266,7 +266,7 @@ struct DoorSoundsCard: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack {
-                Label("Door SFX (LidDoor)", systemImage: "door.left.hand.open")
+                Label("Hinge Creak SFX (LidCreak)", systemImage: "door.left.hand.open")
                     .font(.system(size: 13, weight: .semibold))
                 Spacer()
                 Toggle("", isOn: $enabled)
@@ -294,23 +294,13 @@ struct DoorSoundsCard: View {
                     }
                     
                     // Demo sound triggers
-                    HStack(spacing: 8) {
-                        Button(action: { SoundSynth.shared.playOpenSound() }) {
-                            Text("Test Open")
-                                .font(.system(size: 10, weight: .medium))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        
-                        Button(action: { SoundSynth.shared.playCloseSound() }) {
-                            Text("Test Slam")
-                                .font(.system(size: 10, weight: .medium))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                    Button(action: { SoundSynth.shared.playOpenSound() }) {
+                        Text("Test Creak")
+                            .font(.system(size: 10, weight: .medium))
+                            .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }

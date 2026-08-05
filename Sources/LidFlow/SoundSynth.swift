@@ -19,7 +19,6 @@ class SoundSynth {
     var doorSoundVolume: Float = 0.5 {
         didSet {
             creakPlayer?.volume = doorSoundVolume
-            slamPlayer?.volume = doorSoundVolume
         }
     }
     
@@ -28,7 +27,6 @@ class SoundSynth {
     
     // Audio Players for Door Sounds
     private var creakPlayer: AVAudioPlayer?
-    private var slamPlayer: AVAudioPlayer?
     
     // AVAudioEngine for Theremin
     private var engine: AVAudioEngine?
@@ -75,28 +73,12 @@ class SoundSynth {
         creakPlayer?.enableRate = true
         creakPlayer?.prepareToPlay()
         creakPlayer?.volume = doorSoundVolume
-        
-        // Setup slam sound player
-        let slamWav = generateDoorSlamWav()
-        do {
-            slamPlayer = try AVAudioPlayer(data: slamWav)
-            slamPlayer?.prepareToPlay()
-            slamPlayer?.volume = doorSoundVolume
-        } catch {
-            print("Failed to initialize door sound players: \(error)")
-        }
     }
     
     func playOpenSound() {
         guard isDoorSoundsEnabled else { return }
         creakPlayer?.currentTime = 0
         creakPlayer?.play()
-    }
-    
-    func playCloseSound() {
-        guard isDoorSoundsEnabled else { return }
-        slamPlayer?.currentTime = 0
-        slamPlayer?.play()
     }
     
     // MARK: - Theremin Engine Setup
@@ -207,11 +189,6 @@ class SoundSynth {
             return
         }
         
-        // Reset slam flag when screen is opened past 15 degrees
-        if angle > 15.0 {
-            hasSlammed = false
-        }
-        
         let absDelta = abs(deltaAngle)
         
         // Dynamic creak playback based on lid motion speed
@@ -238,13 +215,6 @@ class SoundSynth {
                     player.pause()
                 }
             }
-        }
-        
-        // Trigger door slam sound when the lid closes to a low angle
-        if angle < 8.0 && deltaAngle < 0 && !hasSlammed {
-            hasSlammed = true
-            creakPlayer?.stop() // stop creaking immediately on slam
-            playCloseSound()
         }
     }
     
@@ -301,39 +271,6 @@ class SoundSynth {
             
             let signal = (wave + noise) * pulseEnv * decayEnv
             let sample = Int16(signal * 20000.0)
-            samples.append(sample)
-        }
-        
-        let dataSize = samples.count * MemoryLayout<Int16>.size
-        var audioData = createWavHeader(sampleRate: Int(sampleRate), numChannels: 1, bitsPerSample: 16, dataSize: dataSize)
-        samples.withUnsafeBufferPointer { audioData.append($0) }
-        return audioData
-    }
-    
-    private func generateDoorSlamWav() -> Data {
-        let sampleRate = 22050.0
-        let duration = 0.45
-        let totalSamples = Int(sampleRate * duration)
-        var samples = [Int16]()
-        
-        for i in 0..<totalSamples {
-            let t = Double(i) / sampleRate
-            
-            // Deep low frequency thump of door frame
-            let thumpFreq = 62.0 * exp(-13.0 * t)
-            let thump = sin(2.0 * Double.pi * thumpFreq * t) * exp(-14.0 * t)
-            
-            // Mid range resonance of the door wood
-            let woodResonance = sin(2.0 * Double.pi * 170.0 * t) * exp(-28.0 * t)
-            
-            // Latch metal click
-            let click = sin(2.0 * Double.pi * 1300.0 * t) * exp(-180.0 * t)
-            
-            // Noise impact echo
-            let noise = Double.random(in: -1.0...1.0) * exp(-20.0 * t)
-            
-            let signal = (thump * 0.68) + (woodResonance * 0.18) + (click * 0.08) + (noise * 0.06)
-            let sample = Int16(signal * 25000.0)
             samples.append(sample)
         }
         
