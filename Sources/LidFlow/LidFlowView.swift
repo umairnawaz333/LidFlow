@@ -56,10 +56,6 @@ struct VisualizerCanvas: View {
         VStack(spacing: 0) {
             // Top Status Bar
             HStack {
-                Text("LidFlow Hinge Utility")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
-                
                 Spacer()
                 
                 HStack(spacing: 12) {
