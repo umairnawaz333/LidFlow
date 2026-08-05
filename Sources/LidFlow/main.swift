@@ -10,12 +10,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // Build window
         window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 660),
+            contentRect: NSRect(x: 0, y: 0, width: 750, height: 480),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
-        window.minSize = NSSize(width: 320, height: 550)
+        window.minSize = NSSize(width: 680, height: 400)
         window.center()
         window.setFrameAutosaveName("LidFlowMainWindow")
         window.title = "LidFlow Hinge Utility"
