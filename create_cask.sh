@@ -25,6 +25,12 @@ cask "lidflow" do
 
   app "LidFlow.app"
 
+  postflight do
+    system_command "xattr",
+                   args: ["-rd", "com.apple.quarantine", "#{appdir}/LidFlow.app"],
+                   sudo: false
+  end
+
   zap trash: [
     "~/.gemini/antigravity",
   ]
